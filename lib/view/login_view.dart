@@ -34,22 +34,53 @@ class _LoginViewState extends State<LoginView> {
       ),
       body: Column(
         children: [
-          TextField(
-            controller: _email,
-            enableSuggestions: true,
-            autocorrect: false,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              hintText: 'Enter your email here',
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 8, top: 10, right: 8, bottom: 5),
+            child: TextField(
+              controller: _email,
+              enableSuggestions: true,
+              autocorrect: false,
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                  hintText: 'Enter your email here',
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.black),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.blue, width: 2),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: const BorderSide(color: Colors.red, width: 2),
+                    borderRadius: BorderRadius.circular(10),
+                  )),
             ),
           ),
-          TextField(
-            controller: _password,
-            obscureText: true,
-            enableSuggestions: false,
-            autocorrect: false,
-            decoration: const InputDecoration(
-              hintText: "Enter your password here",
+          Padding(
+            padding:
+                const EdgeInsets.only(left: 8, top: 10, right: 8, bottom: 20),
+            child: TextField(
+              controller: _password,
+              obscureText: true,
+              enableSuggestions: false,
+              autocorrect: false,
+              decoration: InputDecoration(
+                hintText: "Enter your password here",
+                enabledBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.black),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.blue, width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                errorBorder: OutlineInputBorder(
+                  borderSide: const BorderSide(color: Colors.red, width: 2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
           ),
           TextButton(
@@ -74,7 +105,7 @@ class _LoginViewState extends State<LoginView> {
           TextButton(
             onPressed: () {
               Navigator.of(context)
-                  .pushNamedAndRemoveUntil('/login/', (route) => false);
+                  .pushNamedAndRemoveUntil('/register/', (route) => false);
             },
             child: const Text('Not Registered? Register Here!'),
           )
