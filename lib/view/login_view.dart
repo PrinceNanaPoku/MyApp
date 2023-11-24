@@ -1,7 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
-
 import 'package:myapp/constants/routes.dart';
 
 class LoginView extends StatefulWidget {
@@ -101,9 +99,33 @@ class _LoginViewState extends State<LoginView> {
                 }
               } on FirebaseAuthException catch (e) {
                 if (e.code == 'user-not-found') {
-                  devtools.log('User Not Found');
+                  if (context.mounted) {
+                    await showErrorDialog(
+                      context,
+                      'User not found',
+                    );
+                  }
                 } else if (e.code == 'wrong-password') {
-                  devtools.log('Wrong Password');
+                  if (context.mounted) {
+                    await showErrorDialog(
+                      context,
+                      'Wrong password',
+                    );
+                  } else {
+                    if (context.mounted) {
+                      await showErrorDialog(
+                        context,
+                        'error: ${e.code}',
+                      );
+                    }
+                  }
+                } else {
+                  if (context.mounted) {
+                    await showErrorDialog(
+                      context,
+                      e.toString(),
+                    );
+                  }
                 }
               }
             },
@@ -122,4 +144,27 @@ class _LoginViewState extends State<LoginView> {
       ),
     );
   }
+}
+
+Future<void> showErrorDialog(
+  BuildContext context,
+  String text,
+) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('An error occurred'),
+        content: Text(text),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: const Text('OK'),
+          ),
+        ],
+      );
+    },
+  );
 }
