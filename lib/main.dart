@@ -17,9 +17,10 @@ void main() {
     ),
     home: const HomePage(),
     routes: {
-      '/login/': (context) => const LoginView(),
-      '/register/': (context) => const RegisterView(),
-      '/notes': (context) => const NotesView()
+      loginView: (context) => const LoginView(),
+      registerView: (context) => const RegisterView(),
+      notesView: (context) => const NotesView(),
+      verifyEmailView: (context) => const VerifiedEmailView()
     },
   ));
 }
