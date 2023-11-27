@@ -1,6 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:myapp/constants/routes.dart';
+import 'package:myapp/services/auth/auth_exceptions.dart';
+import 'package:myapp/services/auth/auth_service.dart';
 import 'package:myapp/utilities/error_dialog.dart';
 
 class LoginView extends StatefulWidget {
@@ -86,64 +87,55 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
           TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
-                  email: email,
-                  password: password,
-                );
-                final user = FirebaseAuth.instance.currentUser;
-                if (user?.emailVerified ?? false) {
-                  if (context.mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      notesView,
-                      (route) => false,
-                    );
+              onPressed: () async {
+                final email = _email.text;
+                final password = _password.text;
+
+                try {
+                  await AuthService.firebase().logIn(
+                    email: email,
+                    password: password,
+                  );
+                  final user = AuthService.firebase().currentUser;
+                  if (user?.isEmailVerified ?? false) {
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        notesView,
+                        (route) => false,
+                      );
+                    }
+                  } else {
+                    if (context.mounted) {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        verifyEmailView,
+                        (route) => false,
+                      );
+                    }
                   }
-                } else {
-                  if (context.mounted) {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      verifyEmailView,
-                      (route) => false,
-                    );
-                  }
-                }
-              } on FirebaseAuthException catch (e) {
-                if (e.code == 'user-not-found') {
+                } on UserNotFoundAuthException {
                   if (context.mounted) {
                     await showErrorDialog(
                       context,
                       'User not found',
                     );
                   }
-                } else if (e.code == 'wrong-password') {
+                } on WrongPasswordAuthException {
                   if (context.mounted) {
                     await showErrorDialog(
                       context,
                       'Wrong password',
                     );
-                  } else {
-                    if (context.mounted) {
-                      await showErrorDialog(
-                        context,
-                        'error: ${e.code}',
-                      );
-                    }
+                  }
+                } on GenericAuthException {
+                  if (context.mounted) {
+                    await showErrorDialog(
+                      context,
+                      'Authentication Error',
+                    );
                   }
                 }
-              } catch (e) {
-                if (context.mounted) {
-                  await showErrorDialog(
-                    context,
-                    e.toString(),
-                  );
-                }
-              }
-            },
-            child: const Text('LogIn'),
-          ),
+              },
+              child: const Text('LogIn')),
           TextButton(
             onPressed: () {
               Navigator.of(context).pushNamedAndRemoveUntil(
