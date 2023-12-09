@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:myapp/constants/routes.dart';
 import 'package:myapp/services/auth/auth_service.dart';
 import 'package:myapp/view/login_view.dart';
-import 'package:myapp/view/notes/create_update_new_note-view.dart';
+import 'package:myapp/view/notes/create_update_new_note_view.dart';
 import 'package:myapp/view/notes/notes_view.dart';
 import 'package:myapp/view/register_view.dart';
 import 'package:myapp/view/verify_email_view.dart';

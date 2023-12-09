@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:myapp/exceptions/list/filter.dart';
 import 'package:myapp/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' show join;
@@ -8,6 +9,8 @@ import 'package:path_provider/path_provider.dart';
 class NoteService {
   Database? _db;
   List<DatabaseNote> _note = [];
+
+  DatabaseUser? _user;
 
   static final NoteService _shared = NoteService._sharedInstance();
   NoteService._sharedInstance() {
@@ -19,15 +22,32 @@ class NoteService {
   factory NoteService() => _shared;
 
   late final StreamController<List<DatabaseNote>> _notesStreamController;
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
+  Stream<List<DatabaseNote>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser != null) {
+          return note.id == currentUser.id;
+        } else {
+          throw GetUserBeforeReturningNotes();
+        }
+      });
 
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentUser = true,
+  }) async {
     try {
       final user = await getUser(email: email);
+      if (setAsCurrentUser) {
+        _user = user;
+      }
       return user;
     } on UserDoesNotExist {
-      final user = await createUser(email: email);
-      return user;
+      final createdUser = await createUser(email: email);
+      if (setAsCurrentUser) {
+        _user = createdUser;
+      }
+      return createdUser;
     } catch (e) {
       rethrow;
     }
@@ -48,10 +68,15 @@ class NoteService {
     final db = _getDatabaseOrThrow();
     await getNote(id: note.id);
 
-    final updateCount = await db.update(notesTable, {
-      textColumn: text,
-      syncdWithCloudColumn: 0,
-    });
+    final updateCount = await db.update(
+      notesTable,
+      {
+        textColumn: text,
+        syncdWithCloudColumn: 0,
+      },
+      where: 'id = ?',
+      whereArgs: [note.id],
+    );
 
     if (updateCount == 0) {
       throw CouldNotUpdateNotes();
