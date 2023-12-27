@@ -28,7 +28,11 @@ class _NotesViewState extends State<NotesView> {
     super.dispose();
   }
 
+<<<<<<< HEAD
   String get userEmail => AuthService.firebase().currentUser!.email;
+=======
+  String get userEmail => AuthService.firebase().currentUser!.email!;
+>>>>>>> eaafe14d6c4b837196a299be73278885ed2adf74
   @override
   Widget build(BuildContext context) {
     return Scaffold(
